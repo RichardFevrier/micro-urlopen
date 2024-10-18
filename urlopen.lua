@@ -1,8 +1,9 @@
-VERSION = "0.0.0"
+VERSION = "1.0.0"
 
 local micro = import("micro")
 local config = import("micro/config")
 local shell = import("micro/shell")
+local runtime = import("runtime")
 
 function init()
 	config.MakeCommand("urlopen", urlopen, config.NoComplete)
@@ -14,25 +15,24 @@ function urlopen(bp)
 	local buf = bp.Buf
 	local line = buf:Line(c.Y)
 
-	local start, stop = string.find(line, "https?://[^ )>]+")
+	local start, stop = string.find(line, "https?://[-%()_.!~*';/?:@&=+$,A-Za-z0-9]+")
 	if start then
 		local result = string.sub(line,start,stop)
 		if (c.X >= start - 1) and (c.X <= stop - 1) then
-			shell.JobSpawn("open", {result}, nil, renameStderr, renameExit, bp)
+		    local goos = runtime["GOOS"]
+		    local cmd = ""
+		    if goos == "darwin" then
+                cmd = "open "
+            elseif goos == "linux" then
+                cmd = "xdg-open "
+            elseif goos == "windows" then
+                cmd = "start "
+            end
+		    shell.RunCommand(cmd..result)
 		else
 			micro.InfoBar():Message("Not a link")
 		end
 	else
 		micro.InfoBar():Message("Not a link")
 	end
-end
-
-function renameStderr(err)
-    micro.Log(err)
-    micro.InfoBar():Message(err)
-end
-
-function renameExit(output, args)
-    local bp = args[1]
-    bp.Buf:ReOpen()
 end

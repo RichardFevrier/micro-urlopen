@@ -6,8 +6,8 @@
   "License": "MIT",
   "Versions": [
     {
-      "Version": "0.0.0",
-      "Url": "https://github.com/pjg11/micro-urlopen/archive/v0.0.0.zip",
+      "Version": "1.0.0",
+      "Url": "https://github.com/pjg11/micro-urlopen/archive/1.0.0.zip",
       "Require": {
         "micro": ">=2.0.13"
       }
